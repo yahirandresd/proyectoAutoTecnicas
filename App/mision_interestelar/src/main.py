@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from PyQt6.QtCore import Qt
 from ui import UniversoWidget
@@ -12,7 +11,7 @@ class VentanaInicial(QWidget):
         super().__init__()
 
         self.setWindowTitle("Seleccionar Módulo")
-        self.setFixedSize(1280, 720)
+        self.setFixedSize(1920, 1080)
 
         # Centrar ventana en pantalla usando QScreen (PyQt6)
         screen = QApplication.primaryScreen().availableGeometry()
@@ -79,9 +78,7 @@ class VentanaInicial(QWidget):
 
     def ir_mision(self):
         try:
-            ruta = os.path.join(os.path.dirname(__file__), '..', 'data', 'universo.json')
-            universo = Universo(ruta)
-            self.ventana_mision = UniversoWidget(universo)
+            self.ventana_mision = UniversoWidget()
             self.ventana_mision.show()
             self.close()
             print("Misión Interestelar abierta correctamente.")
