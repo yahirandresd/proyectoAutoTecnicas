@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt, QTimer
 import os
 from universo import Universo  # Asegúrate de que esta importación es correcta
 from algoritmo import Algoritmo
+from nave import Nave
 import json
 
 from PyQt6.QtGui import QPixmap
@@ -118,8 +119,11 @@ class UniversoWidget(QWidget):
         try:
             # Cargar el universo con la ruta seleccionada
             self.universo = Universo(ruta)
-            # Crear la instancia de Algoritmo con el universo ya cargado ✅
-            self.algoritmo = Algoritmo(self.universo)
+                    # ✅ Crear la nave con su energía inicial
+            self.nave = Nave(self.universo)
+
+        # ✅ Pasar universo y nave al algoritmo
+            self.algoritmo = Algoritmo(self.universo, self.nave)
 
            # Si tu algoritmo necesita usar la escena para animar
             self.algoritmo.configurar_grafica(self.escena, self.vista)
@@ -201,10 +205,10 @@ class UniversoWidget(QWidget):
     def iniciar_recorrido(self):
      x = self.universo.origen[0]
      y = self.universo.origen[1]
-     energia = self.universo.cargaInicial
      camino = []
 
-     exito, camino = self.algoritmo.backtracking(x, y, energia, camino, self.universo)
+    # Llamamos a backtracking sin pasar la energía ni el universo
+     exito, camino = self.algoritmo.backtracking(x, y, camino)
      if exito:
         self.algoritmo.animar_camino(camino)
      else:

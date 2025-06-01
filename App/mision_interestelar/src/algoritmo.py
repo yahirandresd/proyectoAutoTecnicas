@@ -4,8 +4,9 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import QTimer
 from universo import Universo
 class Algoritmo:
- def __init__(self, universo):
+ def __init__(self, universo, nave):
         self.universo = universo
+        self.nave = nave
         self.filas = universo.filas
         self.columnas = universo.columnas
         self.tam_celda = 25
@@ -16,42 +17,33 @@ class Algoritmo:
         self.vista = vista
 
 
- def backtracking(self, x, y, energia, camino):
-    if not self.es_valido(x, y, energia, camino):
+ def backtracking(self, x, y, camino):
+    if not self.nave.puede_moverse(x, y):
         return False, []
 
+    self.nave.mover_a(x, y)
     camino.append((x, y))
 
     if (x, y) == tuple(self.universo.destino):
         return True, camino
 
     # Aplicar portales y agujeros de gusano
-    x, y = self.verificar_teletransporte(x, y)
+    x_actual, y_actual = self.verificar_teletransporte(x, y)
 
-    energia = self.actualizar_energia(x, y, energia)
-
-    # Movimiento en 4 direcciones
+    # Intentar moverse en las 4 direcciones
     for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        nx, ny = x + dx, y + dy
-        resultado, nuevo_camino = self.backtracking(nx, ny, energia, camino.copy())
+        nx, ny = x_actual + dx, y_actual + dy
+        resultado, nuevo_camino = self.backtracking(nx, ny, camino.copy())
         if resultado:
             return True, nuevo_camino
 
+    # Retroceder si no encontró camino
+    self.nave.retroceder_de(x, y)
     return False, []
 
- def es_valido(self, x, y, energia, camino):
-    if not (0 <= x < self.universo.filas and 0 <= y < self.universo.columnas):
-        return False
-    if (x, y) in camino:
-        return False
-    if (x, y) in self.universo.agujerosNegros or (x, y) in self.universo.estrellasGigantes:
-        return False
-    energia -= self.obtener_costo_celda(x, y)
-    if energia < 0:
-        return False
-    return True
- def obtener_costo_celda(self, x, y):
-    return 1  # o el valor por defecto que desees
+
+
+
 
  def verificar_teletransporte(self, x, y):
     for portal in self.universo.portales:
@@ -62,14 +54,7 @@ class Algoritmo:
             return tuple(gusano['salida'])
     return x, y
 
- def actualizar_energia(self, x, y, energia):
-    for zona in self.universo.zonasRecarga:
-        if [x, y] == zona[:2]:
-            return energia * zona[2]
-    for celda in self.universo.celdasCargaRequerida:
-        if celda['coordenada'] == [x, y]:
-            return energia - celda['cargaGastada']
-    return energia - self.obtener_costo_celda(x, y)
+
 
  def animar_camino(self, camino):
     self.paso = 0

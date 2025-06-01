@@ -38,6 +38,7 @@ class Universo:
             self.celdasCargaRequerida = datos.get("celdasCargaRequerida", [])
             self.cargaInicial = datos.get("cargaInicial", 0)
             self.matrizInicial = datos.get("matrizInicial", [])
+            self.matriz = self.matrizInicial  # <-- AÑADE ESTA LÍNEA
 
             # Imprime para depuración
             print("Agujeros Negros:", self.agujerosNegros)
@@ -47,9 +48,12 @@ class Universo:
             print("Filas:", self.filas)
             print("Columnas:", self.columnas)
             if self.matrizInicial:
-                print("matrizInicial:", len(self.matrizInicial), "x", len(self.matrizInicial[0]))
+              self.filas = len(self.matrizInicial)
+              self.columnas = len(self.matrizInicial[0])
+              self.matriz = self.matrizInicial
+              print("matrizInicial:", self.filas, "x", self.columnas)
             else:
-                print("matrizInicial está vacía")
+              print("matrizInicial está vacía")
 
         except Exception as e:
             print(f"Error al cargar el archivo JSON: {e}")
