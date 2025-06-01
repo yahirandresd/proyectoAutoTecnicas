@@ -1,8 +1,12 @@
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QPushButton, QFileDialog, QHBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QWidget, QGridLayout, QLabel, QVBoxLayout, QPushButton, QFileDialog, QHBoxLayout,
+      QMessageBox, QGraphicsScene, QGraphicsView)
+from PyQt6.QtCore import Qt, QTimer
 import os
 from universo import Universo  # Asegúrate de que esta importación es correcta
+from algoritmo import Algoritmo
+import json
 
+from PyQt6.QtGui import QPixmap
 
 class UniversoWidget(QWidget):
     def __init__(self):
@@ -10,15 +14,20 @@ class UniversoWidget(QWidget):
         self.universo = None
         self.setWindowTitle("Universo de Algoritmos - Misión Interestelar")
         self.setStyleSheet("background-color: #0e0e1a; color: white;")
+        # Layout principal
+        main_layout = QVBoxLayout(self)
+        # Escena y vista gráfica para animar la nave
+        self.escena = QGraphicsScene()
+        self.vista = QGraphicsView(self.escena)
+        main_layout.addWidget(self.vista)
 
+        self.tam_celda = 25  # tamaño de cada celda para el dibujo
         # Configurar tamaño
         self.resize(1920, 1080)
 
         # Centrar ventana en la pantalla
         self.center_on_screen()
 
-        # Layout principal
-        main_layout = QVBoxLayout(self)
 
         # Layout para botón de carga (parte superior)
         cargar_layout = QHBoxLayout()
@@ -62,6 +71,7 @@ class UniversoWidget(QWidget):
 
         # Botón para iniciar recorrido
         self.iniciar_btn = QPushButton("Iniciar Recorrido")
+        self.iniciar_btn.clicked.connect(self.iniciar_recorrido)
         self.iniciar_btn.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px;")
         self.iniciar_btn.setEnabled(False)  # Deshabilitado hasta que se cargue un universo
         controls_layout.addWidget(self.iniciar_btn)
@@ -108,6 +118,11 @@ class UniversoWidget(QWidget):
         try:
             # Cargar el universo con la ruta seleccionada
             self.universo = Universo(ruta)
+            # Crear la instancia de Algoritmo con el universo ya cargado ✅
+            self.algoritmo = Algoritmo(self.universo)
+
+           # Si tu algoritmo necesita usar la escena para animar
+            self.algoritmo.configurar_grafica(self.escena, self.vista)
 
             # Ocultar el mensaje de universo vacío
             self.label_vacio.hide()
@@ -182,3 +197,15 @@ class UniversoWidget(QWidget):
             if pos == portal['entrada'] or pos == portal['salida']:
                 return "background-color: orange; border: 1px solid white;"
         return "background-color: #1c1c2e; border: 1px solid gray;"
+    
+    def iniciar_recorrido(self):
+     x = self.universo.origen[0]
+     y = self.universo.origen[1]
+     energia = self.universo.cargaInicial
+     camino = []
+
+     exito, camino = self.algoritmo.backtracking(x, y, energia, camino, self.universo)
+     if exito:
+        self.algoritmo.animar_camino(camino)
+     else:
+        QMessageBox.information(self, "Sin solución", "No existe una ruta válida desde el origen al destino.")
