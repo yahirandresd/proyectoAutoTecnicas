@@ -8,14 +8,14 @@ class Universo:
         self.columnas = 0
         self.origen = []
         self.destino = []
-        self.agujerosNegros = []  # Cambiado para coincidir con el JSON
-        self.estrellasGigantes = []  # Cambiado para coincidir con el JSON
-        self.agujerosGusano = []  # Cambiado para coincidir con el JSON
-        self.portales = []  # Cambiado para coincidir con el JSON
-        self.zonasRecarga = []  # Cambiado para coincidir con el JSON
-        self.celdasCargaRequerida = []  # Cambiado para coincidir con el JSON
+        self.agujerosNegros = []
+        self.estrellasGigantes = []
+        self.agujerosGusano = []
+        self.portales = []
+        self.zonasRecarga = []
+        self.celdasCargaRequerida = []
         self.cargaInicial = 0
-        self.matrizInicial = []  # Cambiado para coincidir con el JSON
+        self.matrizInicial = []
 
         self.cargar_datos()
 
@@ -23,26 +23,33 @@ class Universo:
         try:
             with open(self.ruta_json, 'r') as f:
                 datos = json.load(f)
-                self.filas = datos["matriz"]["filas"]
-                self.columnas = datos["matriz"]["columnas"]
-                self.origen = datos["origen"]
-                self.destino = datos["destino"]
-                self.agujerosNegros = datos["agujerosNegros"]  # Ahora coincide con el JSON
-                self.estrellasGigantes = datos["estrellasGigantes"]  # Ahora coincide con el JSON
-                self.portales = datos["portales"]  # Ahora coincide con el JSON
-                self.agujerosGusano = datos["agujerosGusano"]  # Ahora coincide con el JSON
-                self.zonasRecarga = datos["zonasRecarga"]  # Ahora coincide con el JSON
-                self.celdasCargaRequerida = datos["celdasCargaRequerida"]  # Ahora coincide con el JSON
-                self.cargaInicial = datos["cargaInicial"]
-                self.matrizInicial = datos["matrizInicial"]  # Cambiado para coincidir con el JSON
-                print("Agujeros Negros:", self.agujerosNegros)
-                print("Estrellas Gigantes:", self.estrellasGigantes)
-                print("Portales:", self.portales)
-                print("Agujeros Gusano:", self.agujerosGusano)
 
-                print("Filas:", self.filas)
-                print("Columnas:", self.columnas)
+            matriz_info = datos.get("matriz", {})
+            self.filas = matriz_info.get("filas", 0)
+            self.columnas = matriz_info.get("columnas", 0)
+
+            self.origen = datos.get("origen", [])
+            self.destino = datos.get("destino", [])
+            self.agujerosNegros = datos.get("agujerosNegros", [])
+            self.estrellasGigantes = datos.get("estrellasGigantes", [])
+            self.portales = datos.get("portales", [])
+            self.agujerosGusano = datos.get("agujerosGusano", [])
+            self.zonasRecarga = datos.get("zonasRecarga", [])
+            self.celdasCargaRequerida = datos.get("celdasCargaRequerida", [])
+            self.cargaInicial = datos.get("cargaInicial", 0)
+            self.matrizInicial = datos.get("matrizInicial", [])
+
+            # Imprime para depuración
+            print("Agujeros Negros:", self.agujerosNegros)
+            print("Estrellas Gigantes:", self.estrellasGigantes)
+            print("Portales:", self.portales)
+            print("Agujeros Gusano:", self.agujerosGusano)
+            print("Filas:", self.filas)
+            print("Columnas:", self.columnas)
+            if self.matrizInicial:
                 print("matrizInicial:", len(self.matrizInicial), "x", len(self.matrizInicial[0]))
+            else:
+                print("matrizInicial está vacía")
 
         except Exception as e:
             print(f"Error al cargar el archivo JSON: {e}")

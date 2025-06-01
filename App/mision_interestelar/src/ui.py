@@ -1,105 +1,184 @@
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QHBoxLayout, QPushButton
-from PyQt5.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QVBoxLayout, QPushButton, QFileDialog, QHBoxLayout
+from PyQt6.QtCore import Qt
+import os
+from universo import Universo  # Asegúrate de que esta importación es correcta
 
 
 class UniversoWidget(QWidget):
-    def __init__(self, universo):
+    def __init__(self):
         super().__init__()
-        self.universo = universo
+        self.universo = None
         self.setWindowTitle("Universo de Algoritmos - Misión Interestelar")
         self.setStyleSheet("background-color: #0e0e1a; color: white;")
 
-        # Crear el layout principal
+        # Configurar tamaño
+        self.resize(1920, 1080)
+
+        # Centrar ventana en la pantalla
+        self.center_on_screen()
+
+        # Layout principal
         main_layout = QVBoxLayout(self)
 
-        # Crear el layout para la matriz
+        # Layout para botón de carga (parte superior)
+        cargar_layout = QHBoxLayout()
+        self.btn_cargar = QPushButton("Cargar archivo JSON")
+        self.btn_cargar.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                font-size: 16px;
+                padding: 8px 15px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """)
+        self.btn_cargar.clicked.connect(self.abrir_explorador)
+        cargar_layout.addStretch()
+        cargar_layout.addWidget(self.btn_cargar)
+        cargar_layout.addStretch()
+        main_layout.addLayout(cargar_layout)
+
+        # Layout para la matriz (centro)
         self.layout_matriz = QGridLayout()
         self.layout_matriz.setContentsMargins(10, 10, 10, 10)
-        self.layout_matriz.setSpacing(5)
+        self.layout_matriz.setSpacing(3)
 
-        # Crear el layout para los controles (leyenda y botones)
+        # Mensaje "¡Universo Vacío!" en el centro
+        self.label_vacio = QLabel("¡Universo Vacío!")
+        self.label_vacio.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_vacio.setStyleSheet("font-size: 24px; font-weight: bold; color: white; margin: 50px;")
+
+        # Contenedor para matriz o mensaje
+        matriz_container = QVBoxLayout()
+        matriz_container.addWidget(self.label_vacio)
+        matriz_container.addLayout(self.layout_matriz)
+        main_layout.addLayout(matriz_container)
+
+        # Layout para controles (parte inferior)
         controls_layout = QVBoxLayout()
-        self.layout_leyenda = QVBoxLayout()
+
+        # Botón para iniciar recorrido
+        self.iniciar_btn = QPushButton("Iniciar Recorrido")
+        self.iniciar_btn.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px;")
+        self.iniciar_btn.setEnabled(False)  # Deshabilitado hasta que se cargue un universo
+        controls_layout.addWidget(self.iniciar_btn)
 
         # Leyenda
+        self.layout_leyenda = QVBoxLayout()
         self.leyenda = QLabel("Leyenda:")
         self.leyenda.setStyleSheet("font-size: 14px; color: white;")
         self.layout_leyenda.addWidget(self.leyenda)
 
-        self.leyenda_estrellasGigantes = QLabel("⭐ Estrella gigante")
-        self.layout_leyenda.addWidget(self.leyenda_estrellasGigantes)
+        self.layout_leyenda.addWidget(QLabel("⭐ Estrella gigante"))
+        self.layout_leyenda.addWidget(QLabel("🕳️ Agujero negro"))
+        self.layout_leyenda.addWidget(QLabel("🌌 Agujero gusano"))
+        self.layout_leyenda.addWidget(QLabel("🔑 Portal"))
 
-        self.leyenda_agujeros_negros = QLabel("🕳️ Agujero negro")
-        self.layout_leyenda.addWidget(self.leyenda_agujeros_negros)
-
-        self.leyenda_agujeros_gusano = QLabel("🌌 Agujero gusano")
-        self.layout_leyenda.addWidget(self.leyenda_agujeros_gusano)
-
-        self.leyenda_portales = QLabel("🔑 Portal")
-        self.layout_leyenda.addWidget(self.leyenda_portales)
-
-        # Botón para iniciar el recorrido
-        self.iniciar_btn = QPushButton("Iniciar Recorrido")
-        self.iniciar_btn.setStyleSheet("background-color: #4CAF50; color: white; font-size: 16px;")
-        controls_layout.addWidget(self.iniciar_btn)
-
-        # Agregar la matriz y los controles al layout principal
-        main_layout.addLayout(self.layout_matriz)
+        controls_layout.addLayout(self.layout_leyenda)
         main_layout.addLayout(controls_layout)
 
-        # Agregar la leyenda
-        controls_layout.addLayout(self.layout_leyenda)
+    def center_on_screen(self):
+        """Centra la ventana en la pantalla."""
+        # Obtener el rectángulo de la pantalla
+        screen_geometry = self.screen().geometry()
 
-        self.crear_matriz()
+        # Calcular el centro
+        center_x = (screen_geometry.width() - self.width()) // 2
+        center_y = (screen_geometry.height() - self.height()) // 2
+
+        # Mover la ventana al centro
+        self.move(center_x, center_y)
+
+    def abrir_explorador(self):
+        # Abrir diálogo de selección de archivos
+        ruta_archivo, _ = QFileDialog.getOpenFileName(
+            self,
+            "Seleccionar archivo JSON",
+            "",
+            "Archivos JSON (*.json)"
+        )
+
+        if ruta_archivo:
+            self.cargar_universo(ruta_archivo)
+
+    def cargar_universo(self, ruta):
+        try:
+            # Cargar el universo con la ruta seleccionada
+            self.universo = Universo(ruta)
+
+            # Ocultar el mensaje de universo vacío
+            self.label_vacio.hide()
+
+            # Habilitar el botón de iniciar recorrido
+            self.iniciar_btn.setEnabled(True)
+
+            # Cambiar el texto del botón cargar
+            self.btn_cargar.setText("Cargar otro archivo")
+
+            # Crear la matriz
+            self.crear_matriz()
+
+            print(f"Universo cargado desde: {ruta}")
+        except Exception as e:
+            print(f"Error al cargar el universo: {e}")
+            self.label_vacio.setText(f"Error al cargar el archivo: {e}")
+            self.label_vacio.show()
 
     def crear_matriz(self):
+        # Limpiar matriz existente
+        while self.layout_matriz.count():
+            item = self.layout_matriz.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        # Crear nueva matriz
         for i in range(self.universo.filas):
             for j in range(self.universo.columnas):
                 numero = self.universo.matrizInicial[i][j]
                 simbolo = self.obtener_simbolo(i, j)
-
                 contenido = f"{numero} {simbolo}" if simbolo else str(numero)
-                print(
-                    f"Creando celda: ({i}, {j}) - Contenido: {contenido}")  # Para ver el contenido que se está añadiendo
-
                 celda = QLabel(contenido)
-                celda.setFixedSize(60, 60)  # Tamaño de la celda
-                celda.setAlignment(Qt.AlignCenter)
+                celda.setFixedSize(25, 25)
+                celda.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 celda.setStyleSheet(self.obtener_estilo_celda(i, j))
                 self.layout_matriz.addWidget(celda, i, j)
 
     def obtener_simbolo(self, i, j):
-        # Verificar si es el origen
-        if [i, j] == self.universo.origen:
-            return "O"  # Origen
-        # Verificar si es el destino
-        if [i, j] == self.universo.destino:
-            return "D"  # Destino
-        # Agujeros negros
-        if [i, j] in self.universo.agujerosNegros:
+        pos = [i, j]
+        if pos == self.universo.origen:
+            return "O"
+        if pos == self.universo.destino:
+            return "D"
+        if pos in self.universo.agujerosNegros:
             return "🕳️"
-        # estrellasGigantes gigantes
-        if [i, j] in self.universo.estrellasGigantes:
+        if pos in self.universo.estrellasGigantes:
             return "⭐"
-        # Agujeros gusano
-        if any([i, j] == entrada for entrada, _ in self.universo.agujerosGusano):
-            return "🌌"
-        # Portales
-        if any([i, j] == desde for desde, _ in self.universo.portales):
-            return "🔑"
-        return ""  # Si no tiene símbolo
+        for gusano in self.universo.agujerosGusano:
+            if pos == gusano['entrada'] or pos == gusano['salida']:
+                return "🌌"
+        for portal in self.universo.portales:
+            if pos == portal['entrada'] or pos == portal['salida']:
+                return "🔑"
+        return ""
 
     def obtener_estilo_celda(self, i, j):
-        if (i, j) == self.universo.origen:
+        pos = [i, j]
+        if pos == self.universo.origen:
             return "background-color: green; border: 1px solid white;"
-        if (i, j) == self.universo.destino:
+        if pos == self.universo.destino:
             return "background-color: red; border: 1px solid white;"
-        if (i, j) in self.universo.agujerosNegros:
+        if pos in self.universo.agujerosNegros:
             return "background-color: black; border: 1px solid white;"
-        if (i, j) in self.universo.estrellasGigantes:
-            return "background-color: yellow; border: 1px solid white;"  # Estilo para estrella
-        if any((i, j) == entrada for entrada, _ in self.universo.agujerosGusano):
-            return "background-color: blue; border: 1px solid white;"  # Estilo para agujero gusano
-        if any((i, j) == desde for desde, _ in self.universo.portales):
-            return "background-color: orange; border: 1px solid white;"  # Estilo para portal
-        return "background-color: #1c1c2e; border: 1px solid gray;"  # Fondo de celdas vacías
+        if pos in self.universo.estrellasGigantes:
+            return "background-color: yellow; border: 1px solid white;"
+        for gusano in self.universo.agujerosGusano:
+            if pos == gusano['entrada'] or pos == gusano['salida']:
+                return "background-color: blue; border: 1px solid white;"
+        for portal in self.universo.portales:
+            if pos == portal['entrada'] or pos == portal['salida']:
+                return "background-color: orange; border: 1px solid white;"
+        return "background-color: #1c1c2e; border: 1px solid gray;"
