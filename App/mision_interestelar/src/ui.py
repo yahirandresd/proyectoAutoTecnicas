@@ -6,7 +6,7 @@ from universo import Universo
 from algoritmo import Algoritmo
 from nave import Nave
 import json
-from PyQt6.QtGui import QPixmap, QFont, QPalette, QColor
+from PyQt6.QtGui import QPixmap, QFont, QPalette, QColor, QPainter
 
 class UniversoWidget(QWidget):
     def __init__(self):
@@ -41,11 +41,12 @@ class UniversoWidget(QWidget):
 
         # Layout principal
         main_layout = QVBoxLayout(self)
-        main_layout.setSpacing(20)
-        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(10, 10, 10, 10)
 
         # Panel superior
         top_panel = QHBoxLayout()
+        top_panel.setSpacing(5)
         
         # Botones del panel superior
         self.btn_cargar = QPushButton("Cargar JSON")
@@ -82,6 +83,7 @@ class UniversoWidget(QWidget):
 
         # Panel central con vista del universo y leyenda
         central_panel = QHBoxLayout()
+        central_panel.setSpacing(10)
         
         # Contenedor para la matriz
         matriz_container = QVBoxLayout()
@@ -89,9 +91,11 @@ class UniversoWidget(QWidget):
         # Escena y vista gráfica
         self.escena = QGraphicsScene()
         self.vista = QGraphicsView(self.escena)
-        self.vista.setMinimumSize(800, 600)
+        self.vista.setMinimumSize(1200, 800)
         self.vista.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.vista.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.vista.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.vista.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
         
         matriz_container.addWidget(self.vista)
         
@@ -106,10 +110,11 @@ class UniversoWidget(QWidget):
         """)
         matriz_container.addWidget(self.label_vacio)
         
-        central_panel.addLayout(matriz_container, stretch=4)
+        central_panel.addLayout(matriz_container, stretch=5)
 
         # Panel de leyenda y estadísticas
         info_panel = QVBoxLayout()
+        info_panel.setSpacing(5)
         
         # Leyenda
         leyenda_frame = QFrame()
@@ -118,13 +123,14 @@ class UniversoWidget(QWidget):
             QFrame {
                 background-color: rgba(255, 255, 255, 0.1);
                 border-radius: 10px;
-                padding: 10px;
+                padding: 5px;
             }
         """)
         leyenda_layout = QVBoxLayout(leyenda_frame)
+        leyenda_layout.setSpacing(2)
         
         leyenda_titulo = QLabel("Leyenda")
-        leyenda_titulo.setStyleSheet("font-size: 18px; font-weight: bold; margin-bottom: 10px;")
+        leyenda_titulo.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 5px;")
         leyenda_layout.addWidget(leyenda_titulo)
         
         leyendas = [
@@ -139,8 +145,9 @@ class UniversoWidget(QWidget):
         for simbolo, texto, color in leyendas:
             item_layout = QHBoxLayout()
             simbolo_label = QLabel(simbolo)
-            simbolo_label.setStyleSheet(f"font-size: 16px; color: {color}; font-weight: bold;")
+            simbolo_label.setStyleSheet(f"font-size: 14px; color: {color}; font-weight: bold;")
             texto_label = QLabel(texto)
+            texto_label.setStyleSheet("font-size: 12px;")
             item_layout.addWidget(simbolo_label)
             item_layout.addWidget(texto_label)
             item_layout.addStretch()
@@ -152,10 +159,11 @@ class UniversoWidget(QWidget):
         self.log_text = QLabel("Log de eventos:")
         self.log_text.setStyleSheet("""
             background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
+            padding: 5px;
             border-radius: 5px;
             font-family: monospace;
-            min-height: 200px;
+            font-size: 11px;
+            min-height: 150px;
         """)
         self.log_text.setWordWrap(True)
         
@@ -177,7 +185,7 @@ class UniversoWidget(QWidget):
         main_layout.addLayout(central_panel)
 
         self.tam_celda = 25
-        self.resize(1200, 800)
+        self.resize(1600, 1000)
         self.center_on_screen()
 
     def center_on_screen(self):

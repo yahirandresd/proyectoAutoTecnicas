@@ -9,12 +9,12 @@ class Algoritmo:
         self.nave = nave
         self.filas = universo.filas
         self.columnas = universo.columnas
-        self.tam_celda = 40
+        self.tam_celda = 60
         self.escena = None
         self.vista = None
         self.contador = 0
-        self.max_llamadas = 100000  # Aumentado nuevamente para matrices grandes
-        self.max_profundidad = 200  # Aumentado para matrices grandes
+        self.max_llamadas = 100000
+        self.max_profundidad = 200
         self.agujeros_negros_destruidos = set()
         self.gusanos_usados = set()
         self.mejor_camino = None
@@ -23,8 +23,8 @@ class Algoritmo:
         self.timer = None
         self.paso_actual = 0
         self.debug = True
-        self.visitados_con_energia = {}  # Nuevo: diccionario para trackear posiciones visitadas con su mejor energía
-        self.log_pasos = []  # Lista para registrar cada paso del camino
+        self.visitados_con_energia = {}
+        self.log_pasos = []
 
     def configurar_grafica(self, escena, vista):
         self.escena = escena
@@ -61,7 +61,7 @@ class Algoritmo:
                     texto_simbolo = QGraphicsTextItem(simbolo)
                     texto_simbolo.setDefaultTextColor(Qt.GlobalColor.white)
                     font = QFont()
-                    font.setPointSize(12)  # Tamaño de fuente más grande para los símbolos
+                    font.setPointSize(16)
                     texto_simbolo.setFont(font)
                     # Centrar el símbolo en la celda
                     pos_x = j * self.tam_celda + (self.tam_celda - texto_simbolo.boundingRect().width()) / 2
@@ -74,10 +74,10 @@ class Algoritmo:
                 texto_costo = QGraphicsTextItem(costo)
                 texto_costo.setDefaultTextColor(Qt.GlobalColor.white)
                 font = QFont()
-                font.setPointSize(8)  # Tamaño de fuente más pequeño para el costo
+                font.setPointSize(12)
                 texto_costo.setFont(font)
-                # Posicionar el costo en la esquina superior izquierda
-                texto_costo.setPos(j * self.tam_celda + 2, i * self.tam_celda + 2)
+                # Posicionar el costo en la esquina superior izquierda con un pequeño margen
+                texto_costo.setPos(j * self.tam_celda + 5, i * self.tam_celda + 5)
                 self.escena.addItem(texto_costo)
 
     def obtener_color_celda(self, i, j):
@@ -142,14 +142,14 @@ class Algoritmo:
         # Crear efecto visual de destrucción
         rect = QGraphicsRectItem(agujero_y * self.tam_celda, agujero_x * self.tam_celda, 
                                self.tam_celda, self.tam_celda)
-        rect.setBrush(QBrush(QColor(255, 0, 0, 127)))  # Rojo transparente
+        rect.setBrush(QBrush(QColor(255, 0, 0, 127)))
         rect.setPen(QPen(Qt.GlobalColor.white, 2))
         self.escena.addItem(rect)
         
         # Añadir texto de explosión
         texto_explosion = QGraphicsTextItem("💥")
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(24)
         texto_explosion.setFont(font)
         texto_explosion.setDefaultTextColor(Qt.GlobalColor.white)
         pos_x = agujero_y * self.tam_celda + (self.tam_celda - texto_explosion.boundingRect().width()) / 2
@@ -361,35 +361,81 @@ class Algoritmo:
         return self.nave.puede_moverse(x, y)
 
     def animar_camino(self, camino):
+        # Detener timer existente si hay uno
+        if hasattr(self, 'timer') and self.timer is not None:
+            self.timer.stop()
+            
+        # Limpiar items existentes
+        self.limpiar_items_camino()
+        
         self.items_camino = []
         self.paso_actual = 0
         self.timer = QTimer()
         self.timer.timeout.connect(lambda: self.animar_paso(camino))
         self.timer.start(500)  # Medio segundo entre pasos
 
+    def limpiar_items_camino(self):
+        """Limpia de manera segura los items de la animación"""
+        if hasattr(self, 'items_camino'):
+            for item in self.items_camino:
+                try:
+                    if item in self.escena.items():
+                        self.escena.removeItem(item)
+                except:
+                    pass  # Ignorar si el item ya no existe
+            self.items_camino.clear()
+
     def animar_paso(self, camino):
         if self.paso_actual >= len(camino):
             self.timer.stop()
             return
 
-        # Limpiar paso anterior
-        for item in self.items_camino:
-            self.escena.removeItem(item)
-        self.items_camino.clear()
+        # Limpiar paso anterior de manera segura
+        self.limpiar_items_camino()
 
         # Dibujar nuevo paso
-        x, y = camino[self.paso_actual]
+        try:
+            x, y = camino[self.paso_actual]
+
+            # Verificar si es un agujero negro que necesita ser destruido
+            if [x, y] in self.universo.agujerosNegros:
+                # Buscar estrella gigante adyacente
+                for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < self.filas and 0 <= ny < self.columnas:
+                        if [nx, ny] in self.universo.estrellasGigantes:
+                            # Mostrar animación de destrucción
+                            self.animar_destruccion_agujero(x, y, nx, ny)
+                            # Esperar un momento antes de continuar
+                            QTimer.singleShot(1000, lambda: self.continuar_animacion(camino, x, y))
+                            return
+
+            # Si no es un agujero negro o ya fue destruido, continuar normalmente
+            self.dibujar_paso_normal(x, y)
+            self.paso_actual += 1
+
+        except Exception as e:
+            print(f"Error en animación: {e}")
+            self.timer.stop()
+
+    def continuar_animacion(self, camino, x, y):
+        """Continúa la animación después de la destrucción del agujero negro"""
+        self.dibujar_paso_normal(x, y)
+        self.paso_actual += 1
+
+    def dibujar_paso_normal(self, x, y):
+        """Dibuja un paso normal de la animación"""
         rect = QGraphicsRectItem(y * self.tam_celda, x * self.tam_celda, 
                                self.tam_celda, self.tam_celda)
         rect.setBrush(QBrush(QColor(0, 255, 0, 127)))
-        rect.setPen(QPen(Qt.GlobalColor.white, 2))  # Borde más grueso para la posición actual
+        rect.setPen(QPen(Qt.GlobalColor.white, 2))
         self.escena.addItem(rect)
         self.items_camino.append(rect)
 
         # Añadir símbolo de nave
         texto_nave = QGraphicsTextItem("🚀")
         font = QFont()
-        font.setPointSize(14)  # Tamaño grande para la nave
+        font.setPointSize(20)
         texto_nave.setFont(font)
         texto_nave.setDefaultTextColor(Qt.GlobalColor.white)
         pos_x = y * self.tam_celda + (self.tam_celda - texto_nave.boundingRect().width()) / 2
@@ -397,8 +443,6 @@ class Algoritmo:
         texto_nave.setPos(pos_x, pos_y)
         self.escena.addItem(texto_nave)
         self.items_camino.append(texto_nave)
-
-        self.paso_actual += 1
 
     def es_objetivo(self, x, y):
         return (x, y) == self.universo.destino
