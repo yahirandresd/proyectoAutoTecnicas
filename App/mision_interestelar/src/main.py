@@ -2,7 +2,7 @@ import sys
 import os
 import json
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QDesktopWidget
-from ui import UniversoWidget
+from App.patrulla_sintactica import UniversoWidget
 from App.sintaxis_galactica.ui import SintaxisWidget  # Asegúrate de tener este archivo para Sintaxis Galáctica
 from universo import Universo
 from PyQt5.QtCore import Qt

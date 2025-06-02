@@ -1,7 +1,0 @@
-iniciar
-    número contador;
-    contador := 0;
-    para contador := 0 hasta 10 hacer
-        mostrar "Iteración";
-    fin
-finalizar
