@@ -235,6 +235,13 @@ class UniversoWidget(QWidget):
         if exito:
             self.actualizar_log(f"¡Camino encontrado! Longitud: {len(camino)} pasos")
             self.actualizar_log(f"Energía final: {self.nave.energia}")
+            
+            # Mostrar el log detallado del camino
+            log_detallado = self.algoritmo.obtener_log_camino()
+            self.actualizar_log("\nRegistro detallado del camino:")
+            for linea in log_detallado.split('\n')[1:]:  # Saltamos la primera línea que es el título
+                self.actualizar_log(linea)
+            
             self.algoritmo.animar_camino(camino)
         else:
             QMessageBox.warning(self, "Sin solución", 

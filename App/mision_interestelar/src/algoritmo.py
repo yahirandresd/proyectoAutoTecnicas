@@ -24,6 +24,7 @@ class Algoritmo:
         self.paso_actual = 0
         self.debug = True
         self.visitados_con_energia = {}  # Nuevo: diccionario para trackear posiciones visitadas con su mejor energía
+        self.log_pasos = []  # Lista para registrar cada paso del camino
 
     def configurar_grafica(self, escena, vista):
         self.escena = escena
@@ -132,8 +133,36 @@ class Algoritmo:
             nx, ny = x + dx, y + dy
             if 0 <= nx < self.filas and 0 <= ny < self.columnas:
                 if [nx, ny] in self.universo.estrellasGigantes:
+                    # Mostrar efecto de destrucción
+                    self.animar_destruccion_agujero(x, y, nx, ny)
                     return True
         return False
+
+    def animar_destruccion_agujero(self, agujero_x, agujero_y, estrella_x, estrella_y):
+        # Crear efecto visual de destrucción
+        rect = QGraphicsRectItem(agujero_y * self.tam_celda, agujero_x * self.tam_celda, 
+                               self.tam_celda, self.tam_celda)
+        rect.setBrush(QBrush(QColor(255, 0, 0, 127)))  # Rojo transparente
+        rect.setPen(QPen(Qt.GlobalColor.white, 2))
+        self.escena.addItem(rect)
+        
+        # Añadir texto de explosión
+        texto_explosion = QGraphicsTextItem("💥")
+        font = QFont()
+        font.setPointSize(16)
+        texto_explosion.setFont(font)
+        texto_explosion.setDefaultTextColor(Qt.GlobalColor.white)
+        pos_x = agujero_y * self.tam_celda + (self.tam_celda - texto_explosion.boundingRect().width()) / 2
+        pos_y = agujero_x * self.tam_celda + (self.tam_celda - texto_explosion.boundingRect().height()) / 2
+        texto_explosion.setPos(pos_x, pos_y)
+        self.escena.addItem(texto_explosion)
+        
+        # Programar la eliminación del efecto visual después de 1 segundo
+        timer = QTimer()
+        timer.setSingleShot(True)
+        timer.timeout.connect(lambda: self.escena.removeItem(rect))
+        timer.timeout.connect(lambda: self.escena.removeItem(texto_explosion))
+        timer.start(1000)
 
     def iniciar_busqueda(self, x, y):
         """Inicia la búsqueda con estado limpio"""
@@ -144,6 +173,37 @@ class Algoritmo:
         self.gusanos_usados.clear()
         self.visitados_con_energia.clear()
         return self.backtracking(x, y, [], set(), 0)
+
+    def registrar_paso(self, x, y, tipo="movimiento", detalle=None):
+        """Registra un paso en el camino con detalles"""
+        energia_actual = self.nave.energia
+        paso = {
+            "posicion": [x, y],
+            "tipo": tipo,
+            "energia": energia_actual,
+            "detalle": detalle
+        }
+        self.log_pasos.append(paso)
+
+    def obtener_log_camino(self):
+        """Retorna el log completo del camino en formato legible"""
+        if not self.log_pasos:
+            return "No hay pasos registrados."
+        
+        log = ["Registro detallado del camino:"]
+        for i, paso in enumerate(self.log_pasos, 1):
+            pos = paso["posicion"]
+            tipo = paso["tipo"]
+            energia = paso["energia"]
+            detalle = paso["detalle"] or ""
+            
+            log_paso = f"Paso {i}: [{pos[0]},{pos[1]}] - {tipo}"
+            if detalle:
+                log_paso += f" ({detalle})"
+            log_paso += f" | Energía: {energia}"
+            log.append(log_paso)
+        
+        return "\n".join(log)
 
     def backtracking(self, x, y, camino, visitados, profundidad):
         self.contador += 1
@@ -177,6 +237,8 @@ class Algoritmo:
                 return False, camino
             else:
                 self.agujeros_negros_destruidos.add((x, y))
+                self.registrar_paso(x, y, "destrucción", "Agujero negro destruido")
+                print(f"¡Agujero negro en ({x}, {y}) destruido!")
 
         # Verificar si la nave puede moverse a la coordenada actual
         if not self.nave.puede_moverse(x, y):
@@ -196,11 +258,27 @@ class Algoritmo:
         self.nave.mover_a(x, y)
         self.visitados_con_energia[pos_key] = self.nave.energia
 
+        # Registrar el paso normal
+        self.registrar_paso(x, y, "movimiento")
+
+        # Verificar si es una zona de recarga
+        for rec_x, rec_y, factor in self.universo.zonasRecarga:
+            if [x, y] == [rec_x, rec_y]:
+                coord_str = f"{rec_x},{rec_y}"
+                if coord_str not in self.nave.recargas_usadas or self.nave.recargas_usadas[coord_str] < 3:
+                    self.registrar_paso(x, y, "recarga", f"Energía multiplicada x{factor}")
+
+        # Verificar si es una celda con carga requerida
+        for celda in self.universo.celdasCargaRequerida:
+            if [x, y] == celda['coordenada']:
+                self.registrar_paso(x, y, "gasto especial", f"Gasto de {celda['cargaGastada']} unidades")
+
         # Verificar si llegó al destino
         if [x, y] == self.universo.destino:
             if self.nave.energia > self.mejor_energia:
                 self.mejor_energia = self.nave.energia
                 self.mejor_camino = list(camino)
+                self.registrar_paso(x, y, "destino", f"¡Meta alcanzada! Energía final: {self.nave.energia}")
                 if self.debug:
                     print(f"¡Destino alcanzado! Energía final: {self.nave.energia}")
             return True, list(camino)
@@ -209,6 +287,7 @@ class Algoritmo:
         nx, ny = self.verificar_teletransporte(x, y)
         if (nx, ny) != (x, y):
             if not (nx, ny) in visitados:
+                self.registrar_paso(x, y, "teletransporte", f"Teletransportado a [{nx},{ny}]")
                 exito, nuevo_camino = self.backtracking(nx, ny, camino, visitados, profundidad + 1)
                 if exito:
                     return True, nuevo_camino
