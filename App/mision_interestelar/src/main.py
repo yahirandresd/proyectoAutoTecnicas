@@ -1,16 +1,9 @@
 import sys
 import os
-<<<<<<< HEAD
-import json
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QDesktopWidget
-from App.patrulla_sintactica import UniversoWidget
-from App.sintaxis_galactica.ui import SintaxisWidget  # Asegúrate de tener este archivo para Sintaxis Galáctica
-=======
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QFont, QPalette, QColor, QMovie
 from ui import UniversoWidget
->>>>>>> 4e6f3e42dd3cf6fd2ad0a981357fd94132b545e2
 from universo import Universo
 
 
@@ -57,7 +50,7 @@ class VentanaInicial(QWidget):
         layout.addWidget(titulo, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Botón "Misión Interestelar"
-        boton_mision = QPushButton("Ir a Misión Interestelar", self)
+        boton_mision = QPushButton("Misión Interestelar", self)
         boton_mision.clicked.connect(self.ir_mision)
         boton_mision.setFixedSize(300, 80)
         boton_mision.setStyleSheet("""
@@ -84,7 +77,7 @@ class VentanaInicial(QWidget):
         layout.addWidget(boton_mision, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Botón "Sintaxis Galáctica"
-        boton_sintaxis = QPushButton("Ir a Sintaxis Galáctica", self)
+        boton_sintaxis = QPushButton("patrulla sintactica", self)
         boton_sintaxis.clicked.connect(self.ir_sintaxis)
         boton_sintaxis.setFixedSize(300, 80)
         boton_sintaxis.setStyleSheet("""
@@ -153,7 +146,14 @@ class VentanaInicial(QWidget):
             print(f"Error al abrir Misión Interestelar: {e}")
 
     def ir_sintaxis(self):
-        self.close()
+        try:
+            from App.patrulla_sintactica.ui.main_window import MainWindow
+            self.ventana_sintaxis = MainWindow()
+            self.ventana_sintaxis.show()
+            self.close()
+            print("Sintaxis Galáctica abierta correctamente.")
+        except Exception as e:
+            print(f"Error al abrir Sintaxis Galáctica: {e}")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
