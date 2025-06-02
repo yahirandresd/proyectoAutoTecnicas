@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (QWidget, QGridLayout, QLabel, QVBoxLayout, QPushButton, QFileDialog, QHBoxLayout,
-      QMessageBox, QGraphicsScene, QGraphicsView)
+      QMessageBox, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem)
 from PyQt6.QtCore import Qt, QTimer
 import os
 from universo import Universo  # Asegúrate de que esta importación es correcta
@@ -208,8 +208,32 @@ class UniversoWidget(QWidget):
      camino = []
 
     # Llamamos a backtracking sin pasar la energía ni el universo
-     exito, camino = self.algoritmo.backtracking(x, y, camino)
+     exito, camino = self.algoritmo.backtracking(x, y, camino, set())
      if exito:
         self.algoritmo.animar_camino(camino)
      else:
         QMessageBox.information(self, "Sin solución", "No existe una ruta válida desde el origen al destino.")
+    def animar_camino(self, camino):
+     self.paso = 0
+     self.camino = camino
+     self.timer = QTimer()
+     self.timer.timeout.connect(self.mostrar_paso)
+     self.timer.start(500)  # medio segundo por paso
+
+    def mostrar_paso(self):
+     if self.paso >= len(self.camino):
+        self.timer.stop()
+        return
+
+     x, y = self.camino[self.paso]
+     self.dibujar_nave_en(x, y)  # método tuyo que pinta la nave
+     self.paso += 1
+
+    def dibujar_nave_en(self, x, y):
+     if hasattr(self, 'nave_actual') and self.nave_actual:
+        self.escena.removeItem(self.nave_actual)
+
+     item = QGraphicsPixmapItem(QPixmap("/assets/astronave.png").scaled(self.tam_celda, self.tam_celda))
+     item.setPos(y * self.tam_celda, x * self.tam_celda)
+     self.escena.addItem(item)
+     self.nave_actual = item

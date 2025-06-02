@@ -3,12 +3,10 @@ class Nave:
         self.energia = universo.cargaInicial
         self.universo = universo
         self.visitados = set()
+        self.historial = []  # Nueva pila para guardar historial de energía y movimientos
 
     def puede_moverse(self, x, y):
      if not (0 <= x < self.universo.filas and 0 <= y < self.universo.columnas):
-        return False
-
-     if (x, y) in self.visitados:
         return False
 
      if (x, y) in self.universo.agujerosNegros:
@@ -27,23 +25,20 @@ class Nave:
 
     def mover_a(self, x, y):
         self.visitados.add((x, y))
+        energia_anterior = self.energia
 
-        # Aplicar recarga si es celda de recarga
         for rec_x, rec_y, factor in self.universo.zonasRecarga:
             if (x, y) == (rec_x, rec_y):
                 self.energia *= factor
+                self.historial.append((x, y, energia_anterior))  # Guardar estado anterior
                 return
 
-        # Aplicar gasto de energía
         self.energia -= self.universo.matriz[x][y]
+        self.historial.append((x, y, energia_anterior))
 
     def retroceder_de(self, x, y):
         self.visitados.remove((x, y))
 
-        # Revertir gasto de energía
-        for rec_x, rec_y, factor in self.universo.zonasRecarga:
-            if (x, y) == (rec_x, rec_y):
-                self.energia /= factor
-                return
-
-        self.energia += self.universo.matriz[x][y]
+        # Recuperar estado anterior
+        _, _, energia_anterior = self.historial.pop()
+        self.energia = energia_anterior
