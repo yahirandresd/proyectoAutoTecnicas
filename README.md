@@ -16,7 +16,7 @@ jsonschema
 Instalación
 
 Clonar este repositorio:
-git clone https://github.com/tu-usuario/universo-algoritmos.git
+git clone https://github.com/yahirandresd/proyectoAutoTecnicas.git
 cd universo-algoritmos
 
 Instalar las dependencias:
