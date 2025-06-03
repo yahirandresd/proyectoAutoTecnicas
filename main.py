@@ -38,7 +38,7 @@ class VentanaPrincipal(QMainWindow):
         fondo_label.setScaledContents(True)
         ruta_base = os.path.join(os.path.dirname(__file__), "App", "mision_interestelar", "assets")
 
-        fondo_movie = QMovie(os.path.join(ruta_base, "fondo.gift.gif"))
+        fondo_movie = QMovie(os.path.join(ruta_base, "space_background.gif"))
         fondo_label.setMovie(fondo_movie)
         fondo_movie.start()
         fondo_label.lower()
@@ -181,7 +181,7 @@ class VentanaPrincipal(QMainWindow):
 
     def abrir_mision_interestelar(self):
         try:
-            ruta_mision = os.path.join(os.path.dirname(__file__), 'App', 'mision_interestelar', 'src', 'main.py')
+            ruta_mision = os.path.join(os.path.dirname(__file__), 'App', 'mision_interestelar', 'src', 'ui.py')
             subprocess.Popen([sys.executable, ruta_mision])
             self.close()
         except Exception as e:

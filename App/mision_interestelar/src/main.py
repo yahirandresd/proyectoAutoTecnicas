@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QDesktopWidget
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt, QSize, QRect
 from PyQt6.QtGui import QFont, QPalette, QColor, QMovie
 from ui import UniversoWidget
@@ -10,18 +10,18 @@ class VentanaInicial(QWidget):
         super().__init__()
         self.setWindowTitle("Misión Interestelar")
         
-        # Obtener el tamaño de la pantalla
-        screen = QDesktopWidget().screenGeometry()
+        # Obtener el tamaño de la pantalla usando QScreen
+        screen = QApplication.primaryScreen().geometry()
         # Establecer el tamaño de la ventana al 80% del tamaño de la pantalla
         window_width = int(screen.width() * 0.8)
         window_height = int(screen.height() * 0.8)
         self.resize(window_width, window_height)
 
         # Centrar ventana en pantalla
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
+        center = QApplication.primaryScreen().availableGeometry().center()
+        frame_geometry = self.frameGeometry()
+        frame_geometry.moveCenter(center)
+        self.move(frame_geometry.topLeft())
 
         # Configurar el fondo animado
         self.background_label = QLabel(self)

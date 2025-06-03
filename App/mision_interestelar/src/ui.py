@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import (QWidget, QGridLayout, QLabel, QVBoxLayout, QPushButton, QFileDialog, QHBoxLayout,
-      QMessageBox, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QScrollArea, QFrame)
+      QMessageBox, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QScrollArea, QFrame, QApplication)
 from PyQt6.QtCore import Qt, QTimer, QSize
 import os
 from universo import Universo
@@ -289,3 +289,10 @@ class UniversoWidget(QWidget):
         if hasattr(self, 'algoritmo') and self.algoritmo.timer:
             self.algoritmo.timer.stop()
         event.accept()
+
+if __name__ == "__main__":
+    import sys
+    app = QApplication(sys.argv)
+    ventana = UniversoWidget()
+    ventana.showMaximized()
+    sys.exit(app.exec())
