@@ -64,5 +64,14 @@ python main.py
 👉 Mira el video completo en YouTube donde explicamos paso a paso el funcionamiento del proyecto en ingles:
 
 [![Ver en YouTube](https://img.shields.io/badge/YouTube-Ver%20video-red?logo=youtube&style=for-the-badge)](https://youtu.be/y9a4TFr68bs?si=wKre3uThjh0rWvtl)
+---
+---
+
+## 📚 Documentación
+
+Consulta los manuales técnicos y de usuario para entender a fondo el proyecto:
+
+- 📘 [Manual Técnico (PDF)](https://github.com/yahirandresd/proyectoAutoTecnicas/blob/main/documents/MANUAL%20DE%20TECNICO.pdf)
+- 📗 [Manual de Usuario (PDF)](https://github.com/yahirandresd/proyectoAutoTecnicas/blob/main/documents/MANUAL%20DE%20USUARIO.pdf)
 
 
