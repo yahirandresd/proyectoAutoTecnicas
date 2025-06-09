@@ -57,4 +57,12 @@ python main.py
 - 👨‍🚀 [**Cesar Andres Rebolledo Lasso**](https://github.com/CesarRL23)
 - 👨‍🚀 [**Jesus David Milian Saza**](https://github.com/jesucr1st0)
 - 👨‍🚀 [**Yahir Andres Rangel Dueñas**](https://github.com/yahirandresd/)
+---
+
+## 🎥 Video Explicativo
+
+👉 Mira el video completo en YouTube donde explicamos paso a paso el funcionamiento del proyecto en ingles:
+
+[![Ver en YouTube](https://img.shields.io/badge/YouTube-Ver%20video-red?logo=youtube&style=for-the-badge)](https://youtu.be/y9a4TFr68bs?si=wKre3uThjh0rWvtl)
+
 
