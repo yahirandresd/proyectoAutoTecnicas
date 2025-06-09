@@ -1,79 +1,60 @@
-Universo de Algoritmos
-Proyecto para la materia de Autómatas y Técnicas de Programación.
-Descripción
-Este proyecto implementa dos módulos principales:
+# 🚀 Universo de Algoritmos
 
-Misión Interestelar: Un sistema que resuelve problemas de exploración galáctica utilizando algoritmos de backtracking recursivo en una matriz que representa el universo.
-Sintaxis Galáctica: Un analizador sintáctico basado en un autómata finito determinista (AFD) para validar la sintaxis del lenguaje Neutrino.
+> Proyecto para la materia de **Autómatas y Técnicas de Programación**  
+> Exploración galáctica + Patrulla sintácticas 👨‍🚀✨
 
-Requisitos
+---
 
-Python 3.8+
-PyQt5
-NumPy
-jsonschema
+## 🌌 Descripción
 
-Instalación
+Este proyecto consta de **dos módulos principales**:
 
-Clonar este repositorio:
+1. 🛰️ **Misión Interestelar**  
+   Sistema de exploración galáctica utilizando **algoritmos de backtracking recursivo** en una matriz que representa el universo.
+
+2. 🧠 **Patrulla Sintáctica**  
+   Analizador sintáctico implementado con un **Autómata Finito Determinista (AFD)** que valida cadenas validas.
+
+---
+
+## ⚙️ Requisitos
+
+[![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)
+
+- 🐍 Python 3.8 o superior  
+- 📦 PyQt5  
+- 🔢 NumPy  
+- 📜 jsonschema  
+
+---
+
+## 📥 Instalación
+
+Clona el repositorio:
+
+```bash
 git clone https://github.com/yahirandresd/proyectoAutoTecnicas.git
 cd universo-algoritmos
+```
+Instala las dependencias necesarias:
 
-Instalar las dependencias:
+```bash
 pip install -r requirements.txt
+```
 
+---
 
-Ejecución
-Para iniciar la aplicación:
+## 🚀 Ejecución
+
+Para iniciar la aplicación, ejecuta el siguiente comando:
+
+```bash
 python main.py
-Módulos
-Módulo 1: Misión Interestelar
+```
+---
+## 👨‍💻 Autores
 
-Implementa un algoritmo de backtracking recursivo para encontrar rutas en un universo.
-Carga mapas desde archivos JSON con diferentes elementos: agujeros negros, estrellas gigantes, agujeros de gusano, etc.
-Muestra gráficamente la ejecución del algoritmo.
+- 👨‍🚀 [**Cesar Andres Rebolledo Lasso**](https://github.com/CesarRL23)
+- 👨‍🚀 [**Jesus David Milian Saza**](https://github.com/jesucr1st0)
+- 👨‍🚀 [**Yahir Andres Rangel Dueñas**](https://github.com/yahirandresd/)
 
-Módulo 2: Sintaxis Galáctica
-
-Implementa un autómata finito determinista para validar la sintaxis del lenguaje Neutrino.
-Verifica la corrección sintáctica de programas escritos en este lenguaje.
-Muestra errores de sintaxis y su ubicación en el código.
-
-Estructura de los archivos de entrada
-Formato JSON para el Módulo 1
-json{
-  "matriz": { "filas": 35, "columnas": 40 },
-  "origen": [0, 0],
-  "destino": [34, 39],
-  "agujerosNegros": [[3,5], [10,20], [8,8]],
-  "estrellasGigantes": [[7,7], [14,14], [20,20]],
-  "portales": [
-    { "desde": [5,10], "hasta": [25,30] },
-    { "desde": [12,3], "hasta": [2,39] }
-  ],
-  "agujerosGusano": [
-    { "entrada": [11,11], "salida": [13,13] },
-    { "entrada": [18,5], "salida": [21,6] }
-  ],
-  "zonasRecarga": [[4,4,3], [15,15,2]],
-  "celdasCargaRequerida": [
-    { "coordenada": [9,9], "cargaGastada": 30 },
-    { "coordenada": [22,22], "cargaGastada": 22 }
-  ],
-  "cargaInicial": 200,
-  "matrizInicial": [[...],[...],[...],...,[...]]
-}
-Formato de código Neutrino para el Módulo 2
-iniciar
-  número contador;
-  contador := 0;
-  para contador := 0 hasta 10 hacer
-    mostrar "Iteración";
-  fin
-finalizar
-
-Autores
-
-Cesar Abdres Rebolledo Lasso
-Jesus David Milian Saza
-yahir Andres Rangel
