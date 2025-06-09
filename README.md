@@ -34,7 +34,7 @@ Clona el repositorio:
 
 ```bash
 git clone https://github.com/yahirandresd/proyectoAutoTecnicas.git
-cd universo-algoritmos
+cd proyectoAutoTecnicas
 ```
 Instala las dependencias necesarias:
 
